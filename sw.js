@@ -1,7 +1,7 @@
 /* Mayah's Rainbow Reef — service worker
    Network-first so updates are picked up automatically, with a cache fallback so
    the app keeps working offline once it has been opened. */
-const CACHE = 'rainbow-reef-v1';
+const CACHE = 'rainbow-reef-v3';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
                 './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

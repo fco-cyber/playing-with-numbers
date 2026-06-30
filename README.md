@@ -25,6 +25,11 @@ A colourful, sound-rich maths **web app** for a 7-year-old learning to count and
 | `Publish-Online.md` | Detailed publishing steps. |
 | `Parent-Guide.md` | How each activity targets Mayah's learning goals. |
 
+## The voice
+The app speaks the numbers aloud using your **device's own natural voice**, which works in **Safari** (and most browsers).
+
+> ⚠️ **Open it in Safari on a Mac/iPad.** Chrome on macOS has a long-standing bug where its voices are listed but stay silent. In Safari, Mayah's built-in Mac voices (Samantha, the Siri voices, etc.) sound natural and lovely. The 🔊 button mutes/unmutes all sound.
+
 > The web-app features (offline, install) only work when the app is served over **https** (GitHub Pages, Netlify, etc.). Opening `index.html` directly from disk still runs the app, just without install/offline.
 
 ## What it teaches

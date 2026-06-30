@@ -80,14 +80,6 @@ body{
 .iconbtn:active{transform:translateY(3px);}
 .iconbtn.home{background:var(--yellow);}
 .iconbtn.muted{background:#dfe9f1; filter:grayscale(.4);}
-.voice-panel{position:fixed; top:64px; right:10px; z-index:55; width:min(320px,94vw);
-  background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:16px; animation:pop .25s ease;}
-.voice-panel[hidden]{display:none;}
-.vp-title{font-family:var(--font-head); font-weight:800; color:var(--sea-deep); margin-bottom:10px; font-size:19px;}
-#voiceSelect{width:100%; font-family:var(--font); font-size:16px; padding:11px; border-radius:12px;
-  border:2px solid #cfe6f4; background:#f3fbff; color:var(--ink); font-weight:600;}
-.vp-row{display:flex; gap:8px; margin-top:12px;}
-.vp-note{margin-top:10px; font-size:13.5px; color:var(--ink-soft); font-weight:600; line-height:1.35;}
 
 /* ---- screens ---- */
 .stage{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(12px,3vw,26px);}
@@ -280,17 +272,7 @@ small.note{display:block; text-align:center; color:#dff4ff; margin-top:18px; fon
   <div class="brand"><span class="logo" id="brandLogo"></span><span>Rainbow Reef</span></div>
   <div class="spacer"></div>
   <div class="chip" id="treasureChip" title="Treasure earned"><span class="big">🐚</span><span id="treasureCount">0</span></div>
-  <button class="iconbtn" id="voiceBtn" title="Choose the talking voice" aria-label="Choose the talking voice">🗣️</button>
   <button class="iconbtn" id="muteBtn" title="Sound on/off" aria-label="Sound on or off">🔊</button>
-</div>
-<div id="voicePanel" class="voice-panel" hidden>
-  <div class="vp-title">🗣️ Talking voice</div>
-  <select id="voiceSelect"><option>Loading voices…</option></select>
-  <div class="vp-row">
-    <button class="btn teal" id="voiceTest">▶ Test</button>
-    <button class="btn grey" id="voiceClose">Done</button>
-  </div>
-  <div class="vp-note" id="voiceNote"></div>
 </div>
 
 <div class="stage">
@@ -410,46 +392,35 @@ const Sound = {
     [1046.5,1318.5,1568.0,2093.0].forEach((f,i)=>this.pluck(f,{dur:0.3,vol:0.11,when:0.42+i*0.1})); }
 };
 
-/* ---------- VOICE (SpeechSynthesis) ---------- */
+/* ---------- VOICE (device SpeechSynthesis — natural voices, e.g. in Safari) ---------- */
 const Voice = {
-  v:null, ok:null, warmed:false, userPicked:false, hinted:false,
+  v:null, warmed:false,
   supported(){ return ('speechSynthesis'in window) && typeof window.SpeechSynthesisUtterance!=='undefined'; },
-  _failHint(){ if(this.hinted || this.userPicked) return; this.hinted=true;
-    try{ FX.toast('🗣️','Tap the speech button (top-right) to pick a voice that talks!'); }catch(e){} },
   list(){ try{ return (this.supported() && speechSynthesis.getVoices && speechSynthesis.getVoices()) || []; }catch(e){ return []; } },
-  // prefer a LOCAL (offline) English voice — network voices often stay silent on file:// pages
-  _pick(vs){ const L=vs.filter(v=>v.localService);
-    return L.find(v=>/en[-_]?AU/i.test(v.lang)) || L.find(v=>/en[-_]?GB/i.test(v.lang)) || L.find(v=>/^en/i.test(v.lang))
+  // prefer a clear, natural on-device English voice (Karen=en-AU, Samantha, etc.)
+  _good:/^(Samantha|Karen|Alex|Daniel|Moira|Tessa|Fiona|Serena|Victoria|Allison|Ava|Susan|Kate|Catherine|Zoe|Oliver|Matilda|Google|Microsoft)/i,
+  _pick(vs){ const L=vs.filter(v=>v.localService); const G=this._good;
+    return L.find(v=>G.test(v.name)&&/en[-_]?AU/i.test(v.lang)) || L.find(v=>G.test(v.name)&&/^en/i.test(v.lang))
+        || L.find(v=>/en[-_]?AU/i.test(v.lang)) || L.find(v=>/^en/i.test(v.lang))
         || vs.find(v=>/en[-_]?AU/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || vs[0]; },
-  setByURI(id){ const v=this.list().find(x=>(x.voiceURI||x.name)===id); if(v){ this.v=v; this.userPicked=true; this.ok=null; return true; } return false; },
-  init(){ if(!this.supported()){ this.ok=false; if(typeof renderVoicePicker==='function') renderVoicePicker(); return; }
-    const load=()=>{ const vs=this.list();
-      if(vs.length){ let chosen=null;
-        if(Store.data.voiceURI) chosen=vs.find(x=>(x.voiceURI||x.name)===Store.data.voiceURI);
-        if(chosen){ this.v=chosen; this.userPicked=true; } else if(!this.userPicked){ this.v=this._pick(vs); } }
-      if(typeof renderVoicePicker==='function') renderVoicePicker(); };
+  init(){ if(!this.supported()) return;
+    const load=()=>{ const vs=this.list(); if(vs.length && !this.v) this.v=this._pick(vs); };
     load(); try{ speechSynthesis.onvoiceschanged=load; }catch(e){}
     setTimeout(load,300); setTimeout(load,1200); },
   warm(){ if(this.warmed || !this.supported()) return; this.warmed=true;
     try{ speechSynthesis.resume(); const u=new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); }catch(e){} },
   say(text,opts){ opts=opts||{};
-    if(!Sound.on) return false;
-    if(!this.supported()){ this.ok=false; return false; }
+    if(!Sound.on || !this.supported()) return false;
     try{
       if(opts.interrupt!==false){ try{ speechSynthesis.cancel(); }catch(e){} }
       if(!this.v){ const vs=speechSynthesis.getVoices()||[]; if(vs.length) this.v=this._pick(vs); }
       const u=new SpeechSynthesisUtterance(String(text));
-      // use our chosen voice; if it wasn't user-picked and a previous attempt errored, fall back to the browser default
-      if(this.v && (this.userPicked || this.ok!==false)){ u.voice=this.v; u.lang=this.v.lang||'en-AU'; } else { u.lang='en-AU'; }
+      if(this.v){ u.voice=this.v; u.lang=this.v.lang||'en-AU'; } else { u.lang='en-AU'; }
       u.rate=opts.rate||0.95; u.pitch=(opts.pitch==null?1.1:opts.pitch); u.volume=1;
-      let started=false;
-      u.onstart=()=>{ started=true; Voice.ok=true; };
-      u.onend=()=>{ if(!started && Voice.ok!==true){ Voice.ok=false; Voice._failHint(); } };   // ended without starting = silent fail
-      u.onerror=()=>{ if(!started && Voice.ok!==true){ Voice.ok=false; Voice._failHint(); } };
-      try{ speechSynthesis.resume(); }catch(e){}   // un-stick a paused engine (common Chrome bug)
+      try{ speechSynthesis.resume(); }catch(e){}   // un-stick a paused engine
       speechSynthesis.speak(u); return true;
-    }catch(e){ this.ok=false; return false; } },
-  num(n){ this.say(n,{rate:0.9}); },
+    }catch(e){ return false; } },
+  num(n){ this.say(String(n),{rate:0.9}); },
   _keep:null,
   keepAlive(on){ if(!('speechSynthesis'in window)) return; clearInterval(this._keep); this._keep=null;
     if(on){ this._keep=setInterval(()=>{ try{ if(speechSynthesis.speaking) speechSynthesis.resume(); }catch(e){} },7000); } },
@@ -568,29 +539,6 @@ $('#muteBtn').onclick=()=>{ Sound.on=!Sound.on; Store.data.soundOn=Sound.on; Sto
   refreshMute(); if(Sound.on){ Sound.ensure(); Sound.pop(); } };
 $('#homeBtn').onclick=()=>{ Sound.click(); go('hub'); };
 
-/* ---------- voice picker (parent setting) ---------- */
-function renderVoicePicker(){ const sel=$('#voiceSelect'); if(!sel) return;
-  const vs=Voice.list();
-  if(!vs.length){ sel.innerHTML='<option>(no voices found on this browser)</option>';
-    $('#voiceNote').innerHTML='No speaking voices were found here. Try <b>Chrome</b> or <b>Safari</b>, or open the online (https) version — numbers still play as musical notes.'; return; }
-  const cur = Voice.v && (Voice.v.voiceURI||Voice.v.name);
-  // English voices first, offline ones flagged
-  vs.sort((a,b)=>(/^en/i.test(b.lang)-/^en/i.test(a.lang)) || (b.localService-a.localService) || a.name.localeCompare(b.name));
-  sel.innerHTML = vs.map(v=>{ const id=(v.voiceURI||v.name); const tag=v.localService?' • offline':'';
-    return `<option value="${String(id).replace(/"/g,'&quot;')}"${id===cur?' selected':''}>${v.name} (${v.lang})${tag}</option>`; }).join('');
-  $('#voiceNote').innerHTML='Pick a voice, then press <b>▶ Test</b>. Voices marked <b>• offline</b> work in any environment.';
-}
-function openVoicePanel(show){ const p=$('#voicePanel'); if(!p) return; p.hidden=!show; if(show) renderVoicePicker(); }
-$('#voiceBtn').onclick=()=>{ Sound.click(); const p=$('#voicePanel'); openVoicePanel(p.hidden); };
-$('#voiceClose').onclick=()=>{ Sound.click(); openVoicePanel(false); };
-$('#voiceSelect').onchange=()=>{ const id=$('#voiceSelect').value; if(Voice.setByURI(id)){ Store.data.voiceURI=id; Store.save(); } };
-$('#voiceTest').onclick=()=>{ Sound.ensure(); Voice.warm(); Voice.ok=null;
-  const note=$('#voiceNote'); note.textContent='Testing…';
-  Voice.say('Hi '+KID+'! One, two, three.');
-  setTimeout(()=>{ note.innerHTML = (Voice.ok===true)
-    ? '✅ That voice works! It will be remembered.'
-    : '🔇 That voice made no sound — try another from the list, or check your device sound &amp; voice settings.'; }, 1100); };
-
 /* ============================================================
    ACTIVITY MODULES inserted below
    ============================================================ */
@@ -598,7 +546,7 @@ $('#voiceTest').onclick=()=>{ Sound.ensure(); Voice.warm(); Voice.ok=null;
    MODULE 1 — MAGIC HUNDREDS CHART  (difficulties 1 & 2)
    ============================================================ */
 registerScreen('chart',(function(){
-  let timer=null, mode='explore', skip=2, countStart=1, stepMs=1300;
+  let timer=null, mode='explore', skip=2, countStart=1, skipStart=1, stepMs=1300;
   function stop(){ if(timer){ clearTimeout(timer); timer=null; } Voice.keepAlive(false); }
   function clearMarks(scr){ $$('.tile',scr).forEach(t=>t.className='tile'); }
   function tile(scr,n){ return $('.tile[data-n="'+n+'"]',scr); }
@@ -606,6 +554,9 @@ registerScreen('chart',(function(){
   function setStart(scr,n){ countStart=Math.max(1,Math.min(100,n));
     clearMarks(scr); const t=tile(scr,countStart); if(t) t.classList.add('marker');
     setReadout(scr,countStart); const sEl=$('#chStart',scr); if(sEl) sEl.textContent=countStart; }
+  function setSkipStart(scr,n){ skipStart=Math.max(1,Math.min(100,n));
+    clearMarks(scr); const t=tile(scr,skipStart); if(t) t.classList.add('marker');
+    setReadout(scr,skipStart); const sEl=$('#chSkipStart',scr); if(sEl) sEl.textContent=skipStart; }
 
   function build(scr){
     scr.innerHTML=`
@@ -634,7 +585,7 @@ registerScreen('chart',(function(){
     const grid=$('#chGrid',scr);
     for(let n=1;n<=100;n++){ const t=el('button','tile',n); t.dataset.n=n;
       t.onclick=()=>{
-        if(mode==='skip'){ return; }
+        if(mode==='skip'){ stop(); Sound.bubble(); setSkipStart(scr,n); Voice.num(n); return; }
         if(mode==='count'){ stop(); Sound.bubble(); setStart(scr,n); Voice.num(n); return; }
         Sound.note(n); clearMarks(scr); t.classList.add('lit'); setReadout(scr,n); Voice.num(n);
       };
@@ -679,21 +630,38 @@ registerScreen('chart',(function(){
       $('#chStop',scr).onclick=()=>{Sound.click();stop();Voice.stop();};
     }
     if(m==='skip'){
-      p.innerHTML=`<div class="controls">
-        <span class="hint">Skip count by:</span>
-        <div class="seg" id="chSkipSeg">
-          <button data-s="2" class="on">2s</button><button data-s="5">5s</button>
-          <button data-s="10">10s</button><button data-s="3">3s</button></div>
-        <button class="btn green big" id="chSkipGo">▶ Go!</button>
-        <button class="btn orange" id="chStop2">⏹ Stop</button></div>
+      p.innerHTML=`
+        <div class="hint" style="margin-bottom:10px">👆 <b>Tap any number</b> to start there (or use − / +), pick a jump size and speed, then press Go! You can skip-count from <b>any</b> number — not just 1. 🌈</div>
+        <div class="controls">
+          <span class="hint">Start at:</span>
+          <button class="btn grey" id="chSkipMinus">−</button>
+          <span class="big-readout" style="font-size:28px;min-width:54px;margin:0" id="chSkipStart">${skipStart}</span>
+          <button class="btn grey" id="chSkipPlus">+</button>
+          <span class="hint" style="margin-left:6px">Jump by:</span>
+          <div class="seg" id="chSkipSeg">
+            <button data-s="2">2s</button><button data-s="3">3s</button>
+            <button data-s="5">5s</button><button data-s="10">10s</button></div>
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <span class="hint">Speed:</span>
+          <div class="seg" id="chSkipSpeed">
+            <button data-ms="1300">🐢 Slow</button><button data-ms="850">🐠 Medium</button><button data-ms="450">🐬 Fast</button></div>
+          <button class="btn green big" id="chSkipGo">▶ Go!</button>
+          <button class="btn orange" id="chStop2">⏹ Stop</button>
+        </div>
         <div class="hint" id="chSkipTip" style="margin-top:10px"></div>`;
+      $$('#chSkipSeg button',scr).forEach(b=>b.classList.toggle('on',+b.dataset.s===skip));
+      $$('#chSkipSpeed button',scr).forEach(b=>b.classList.toggle('on',+b.dataset.ms===stepMs));
+      setSkipStart(scr,skipStart);
       $$('#chSkipSeg button',scr).forEach(b=>b.onclick=()=>{Sound.click();skip=+b.dataset.s;
         $$('#chSkipSeg button',scr).forEach(x=>x.classList.toggle('on',x===b));});
+      $$('#chSkipSpeed button',scr).forEach(b=>b.onclick=()=>{Sound.click();stepMs=+b.dataset.ms;
+        $$('#chSkipSpeed button',scr).forEach(x=>x.classList.toggle('on',x===b));});
+      $('#chSkipMinus',scr).onclick=()=>{Sound.click();stop();setSkipStart(scr,skipStart-1);};
+      $('#chSkipPlus',scr).onclick=()=>{Sound.click();stop();setSkipStart(scr,skipStart+1);};
       $('#chSkipGo',scr).onclick=()=>{ const tip=$('#chSkipTip',scr);
-        tip.innerHTML = skip===10?'Look — counting by 10s goes straight <b>down</b> a column! ⬇️'
-          : skip===5?'Counting by 5s makes <b>two neat columns</b>! 🪜'
-          : 'See the lovely <b>pattern</b> the numbers make? 🌈';
-        Voice.say("Let's skip count by "+skip); animateSkip(scr,skip); };
+        tip.innerHTML = `Counting from <b>${skipStart}</b> in jumps of <b>${skip}</b> — watch the pattern appear! 🌈`;
+        Voice.say("Skip counting by "+skip+" from "+skipStart); animateSkip(scr,skip,skipStart); };
       $('#chStop2',scr).onclick=()=>{Sound.click();stop();};
     }
     if(m==='pattern'){
@@ -726,12 +694,15 @@ registerScreen('chart',(function(){
       i++; timer=setTimeout(step,stepMs); })();
   }
 
-  function animateSkip(scr,s){ stop(); Voice.stop(); clearMarks(scr); Voice.keepAlive(true);
-    const seq=[]; for(let n=s;n<=100;n+=s) seq.push(n);
-    let i=0; (function step(){ if(i>=seq.length){ Sound.correct(); setReadout(scr,'🌈'); Reward.addTreasure(1); Voice.keepAlive(false); return; }
+  function animateSkip(scr,s,start){ stop(); Voice.stop(); clearMarks(scr); Voice.keepAlive(true);
+    start=Math.max(1,Math.min(100,start||1));
+    const seq=[]; for(let n=start;n<=100;n+=s) seq.push(n);
+    if(seq.length<=1){ const t=tile(scr,start); if(t) t.classList.add('lit'); setReadout(scr,start); Voice.num(start);
+      const tip=$('#chSkipTip',scr); if(tip) tip.innerHTML='That start is too high to make many jumps — try a lower number! 😊'; Voice.keepAlive(false); return; }
+    let i=0; (function step(){ if(i>=seq.length){ Sound.correct(); FX.confetti(); setReadout(scr,'🌈'); Reward.addTreasure(1); Voice.keepAlive(false); return; }
       const n=seq[i]; const t=tile(scr,n); if(t){ t.classList.add('lit'); }
       setReadout(scr,n); Sound.count(i,seq.length); Voice.num(n);
-      i++; timer=setTimeout(step,Math.max(550,stepMs-200)); })();
+      i++; timer=setTimeout(step,Math.max(500,stepMs-200)); })();
   }
 
   function paint(scr,pat){ clearMarks(scr); if(pat==='clear'){ return; }

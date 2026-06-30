@@ -2,7 +2,7 @@
 
 A single HTML file. Double-click `Mayahs-Rainbow-Reef.html` to open it in any browser (Chrome, Safari, Edge). Works on computer and tablet. No internet needed. Progress (treasure + sticker friends) saves automatically on the same device.
 
-**Choosing the talking voice:** tap the **🗣️ button** (top right) to open the voice picker. Choose a voice (ones marked **• offline** work in any environment) and press **▶ Test** until you hear it speak — the choice is remembered. If numbers don't speak aloud, this is the fix. For the most reliable voices across all devices/browsers, host the app online (see **Publish-Online.md**). Even with no working voice, every number also plays as a musical note.
+**The talking voice:** the app speaks numbers aloud using the device's own natural voice. **Open it in Safari** on the Mac/iPad — Chrome on macOS has a bug that keeps its voices silent, but Safari uses the lovely built-in Mac voices (Samantha, Siri voices, etc.). Tap 🔊 to mute/unmute.
 
 **Sound:** tap the 🔊 button (top right) to toggle all sound, including the voice that *speaks every number aloud* — this is one of the most useful features for connecting the written symbol to its spoken name. The reef has a rich, gentle sound world: water bubbles and droplets, glockenspiel chimes for correct answers, a treasure "ding" when shells are earned, and **musical counting** — each number plays a note on a soft xylophone, so counting up literally sounds like climbing a scale (and down like descending). All generated live; nothing is ever harsh.
 
@@ -11,7 +11,7 @@ A single HTML file. Double-click `Mayahs-Rainbow-Reef.html` to open it in any br
 ## How each adventure targets Mayah's specific difficulties
 
 **1. Counting up/down on the hundreds & thousands charts**
-→ **Magic Hundreds Chart** → *Count* mode. **Tap any number on the chart** to start there (or use the − / + buttons), choose a **speed** (🐢 Slow is the default — best to start with), then press **Count UP** or **Count DOWN**. Bubbles the fish hops tile-by-tile, lighting and saying each number aloud. *Skip count* reveals the patterns (counting by 10s runs straight down a column — a key insight). **Treasure to 1000** extends the same idea to counting in 100s and 10s.
+→ **Magic Hundreds Chart** → *Count* mode. **Tap any number on the chart** to start there (or use the − / + buttons), choose a **speed** (🐢 Slow is the default — best to start with), then press **Count UP** or **Count DOWN**. Bubbles the fish hops tile-by-tile, lighting and saying each number aloud. *Skip count* now also lets you **choose any start number** (tap a tile or use − / +), the **jump size** (2s, 3s, 5s, 10s) and the **speed** — so you can skip-count from *any* number (e.g. 3, 8, 13, 18…), not just from 1. This reveals the patterns (counting by 10s runs straight down a column — a key insight). **Treasure to 1000** extends the same idea to counting in 100s and 10s.
 
 **2. Spatial / positional sense — a number in relation to others**
 → **Number Detective** → *Neighbours*. Shows a number with its four neighbours colour-coded: 1-less (left), 1-more (right), 10-less (straight up), 10-more (straight down). This makes the chart's hidden structure visible — the single most important concept for her difficulty. *Patterns* mode in the chart reinforces it.

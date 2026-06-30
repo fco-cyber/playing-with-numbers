@@ -25,9 +25,5 @@ Drag **all the files together** onto <https://app.netlify.com/drop> → instant 
 
 ---
 
-## After it's live — set the talking voice
-1. Open the app, tap the **🗣️ button** (top-right).
-2. Pick a voice (ones marked **• offline** work everywhere), press **▶ Test**.
-3. When you hear it speak, you're done — the choice is remembered on that device.
-
-If a voice makes no sound, choose another from the list. Hosting over https usually exposes more (and better) voices than opening the file locally.
+## After it's live — hearing the voice
+Open the app in **Safari** on the Mac/iPad and tap a number — you'll hear the device's natural voice say it. (Chrome on macOS has a bug that keeps its voices silent, so prefer Safari.) Tap 🔊 to mute/unmute all sound.
