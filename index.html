@@ -215,6 +215,12 @@ h1.title{font-family:var(--font-head); font-weight:800; text-align:center; color
   font-weight:800; color:var(--sea-deep); font-size:clamp(18px,3.8vw,24px); border:2px solid #e2f0f9; cursor:pointer; transition:transform .1s;}
 .bond:active{transform:scale(.95);} .bond.done{background:var(--green); color:#fff; border-color:#fff;}
 .rainbow-svg{width:100%; max-width:900px; height:auto; display:block; margin:0 auto;}
+.bn-question{font-family:var(--font-head); font-weight:800; text-align:center; line-height:1;
+  font-size:clamp(46px,13vw,88px); color:var(--sea-deep);
+  background:#fff; border:5px solid #ffe08a; border-radius:28px;
+  padding:18px 16px; margin:8px auto 14px; max-width:600px;
+  box-shadow:0 9px 0 rgba(255,200,60,.3), 0 14px 26px rgba(8,46,82,.16);}
+.bn-question .qm{color:#ff3b3b;}
 .choices{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px;}
 .numcard{cursor:pointer; border:none; width:clamp(54px,16vw,76px); height:clamp(54px,16vw,76px); border-radius:18px;
   font-family:var(--font-head); font-weight:800; font-size:clamp(22px,6vw,32px); color:#fff; background:var(--purple);
@@ -800,7 +806,7 @@ function resetScreen(id){ Sound.pop(); const scr=$('#screen-'+id); const d=Scree
    MODULE 2 — NUMBER DETECTIVE  (difficulties 2 & 3)
    ============================================================ */
 registerScreen('detective',(function(){
-  let mode='find', target=null, streak=0;
+  let mode='find', target=null, streak=0, findAuto=false;
   function grid(scr){ return $('#dtGrid',scr); }
   function tile(scr,n){ return $('.tile[data-n="'+n+'"]',scr); }
   function clearMarks(scr){ $$('.tile',scr).forEach(t=>t.className='tile'); }
@@ -834,13 +840,13 @@ registerScreen('detective',(function(){
     $$('#dtModes button',scr).forEach(b=>b.classList.toggle('on',b.dataset.m===m));
     $('#dtPraise',scr).className='praise';
     const p=$('#dtPanel',scr);
-    if(m==='find'){ streak=0;
+    if(m==='find'){ streak=0; findAuto=false;
       p.innerHTML=`<div class="controls"><div class="hint" style="font-size:clamp(16px,4vw,22px)">🔎 Find: <b id="dtTarget" style="font-size:1.4em;color:var(--pink)"></b></div>
         <button class="btn teal" id="dtSay">🔊 Say it</button>
         <span class="chip" style="background:#e7f6ff;color:var(--sea-deep)">🔥 Streak: <span id="dtStreak">0</span></span></div>
         <p class="lead">Tap the number on the chart. I'll give you a clue if you need one!</p>`;
       newFind(scr);
-      $('#dtSay',scr).onclick=()=>Voice.say("Find "+target);
+      $('#dtSay',scr).onclick=()=>{ findAuto=true; Voice.say("Find "+target); };   /* tapping Say it turns on auto-read for the rounds that follow */
     }
     if(m==='neighbours'){
       p.innerHTML=`<div class="controls">
@@ -866,7 +872,8 @@ registerScreen('detective',(function(){
 
   /* ---- FIND IT ---- */
   function newFind(scr){ target=rand(1,100); clearMarks(scr);
-    const tEl=$('#dtTarget',scr); if(tEl) tEl.textContent=target; }   /* no auto-speak; use the 🔊 Say it button */
+    const tEl=$('#dtTarget',scr); if(tEl) tEl.textContent=target;
+    if(findAuto) Voice.say("Find "+target); }   /* silent on first open; auto-reads each new round once 🔊 Say it has been tapped */
   function checkFind(scr,n){ const pr=$('#dtPraise',scr);
     if(n===target){ Sound.correct(); const t=tile(scr,n); clearMarks(scr); t.classList.add('found');
       streak++; $('#dtStreak',scr).textContent=streak;
@@ -1182,10 +1189,12 @@ registerScreen('bonds',(function(){
 
   /* ---- GAME: find the missing part ---- */
   function renderGame(scr){ const p=$('#bnPanel',scr); found=new Set();
-    p.innerHTML=`<div id="bnGameRb"></div>
-      <div class="big-readout" id="bnQ" style="font-size:clamp(20px,5vw,30px)"></div>
+    p.innerHTML=`
+      <div class="howto" style="text-align:center;margin-bottom:10px">🎯 Tap the number that makes <b>${N}</b>!</div>
+      <div class="bn-question" id="bnQ"></div>
       <div class="choices" id="bnChoices"></div>
-      <p class="lead" style="text-align:center">Find the missing part to make <b>${N}</b>. Fill the whole rainbow to win! 🏆</p>`;
+      <div id="bnGameRb" style="max-width:480px;margin:18px auto 0"></div>
+      <p class="lead" style="text-align:center">Fill the whole rainbow to win! 🏆</p>`;
     nextGame(scr);
   }
   function drawGameRb(scr){ const c=baseVals().length;
@@ -1199,7 +1208,7 @@ registerScreen('bonds',(function(){
       $('#bnChoices',scr).innerHTML=''; FX.celebrate('🏆',`You made every bond to ${N}, ${KID}!`);
       Reward.addTreasure(3); Reward.unlock('rainbow'); return; }
     const a=pick(remaining); const b=N-a;
-    $('#bnQ',scr).innerHTML=`<b style="color:var(--pink)">${a}</b> + <b style="color:var(--blue)">❓</b> = ${N}`;
+    $('#bnQ',scr).innerHTML=`<b style="color:var(--pink)">${a}</b> + <span class="qm">?</span> = <b style="color:var(--blue)">${N}</b>`;
     const opts=new Set([b]); while(opts.size<3){ const o=Math.max(0,Math.min(N,b+pick([-2,-1,1,2,step,-step]))); opts.add(o); }
     const arr=Array.from(opts).sort(()=>Math.random()-0.5);
     const ch=$('#bnChoices',scr); ch.innerHTML='';
