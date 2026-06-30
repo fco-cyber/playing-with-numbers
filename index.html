@@ -461,6 +461,22 @@ const Voice = {
       speechSynthesis.speak(u); return true;
     }catch(e){ return false; } },
   num(n){ this.say(String(n)); },
+  // speak one item and call cb() AFTER it has finished being spoken (+ the pause) — used to pace animations to the voice
+  speakStep(text,cb){
+    const fb=()=>setTimeout(cb,1000);
+    if(!Sound.on || !this.supported()){ fb(); return; }
+    try{ try{ speechSynthesis.cancel(); }catch(e){}
+      this._seq2++;
+      const u=new SpeechSynthesisUtterance(String(text));
+      if(this.v){ u.voice=this.v; u.lang=this.v.lang||'en-AU'; } else u.lang='en-AU';
+      u.rate=this.rate; u.pitch=this.pitch; u.volume=1;
+      let done=false, guard=null;
+      const finish=()=>{ if(done) return; done=true; if(guard) clearTimeout(guard); setTimeout(cb, this.gap); };
+      u.onend=finish; u.onerror=finish; guard=setTimeout(finish,5000);
+      try{ speechSynthesis.resume(); }catch(e){}
+      speechSynthesis.speak(u);
+    }catch(e){ fb(); }
+  },
   // speak each segment as its own utterance, with a controllable pause (this.gap) between them
   sayParts(parts,opts){ opts=opts||{};
     if(!Sound.on) return false;
@@ -1229,8 +1245,8 @@ registerScreen('bonds',(function(){
    MODULE 5 — TREASURE TO 1000  (stretch: counting to 1000)
    ============================================================ */
 registerScreen('thousands',(function(){
-  let mode='hundreds', timer=null;
-  function stop(){ if(timer){clearTimeout(timer);timer=null;} }
+  let mode='hundreds', timer=null, animSeq=0;
+  function stop(){ if(timer){clearTimeout(timer);timer=null;} animSeq++; Voice.stop(); }
   function build(scr){
     scr.innerHTML=`
       <div class="screen-head">
@@ -1292,14 +1308,18 @@ registerScreen('thousands',(function(){
     $$('#thPanel .tile',scr).forEach(x=>x.classList.remove('marker')); t.classList.add('marker');
     const v=+t.dataset.v; $('#thReadout',scr).textContent=v; Voice.num(v); }); }
 
-  function animate(scr,from,to,step){ stop(); const tiles=$$('#thPanel .tile',scr);
+  function animate(scr,from,to,step){ stop(); const my=++animSeq; const tiles=$$('#thPanel .tile',scr);
     tiles.forEach(t=>t.classList.remove('marker','path'));
     const seq=[]; for(let n=from;n<=to;n+=step) seq.push(n);
-    let i=0; (function go(){ if(i>0){ const pt=$('#thPanel .tile[data-v="'+seq[i-1]+'"]',scr); if(pt){pt.classList.remove('marker');pt.classList.add('path');} }
+    let i=0;
+    const go=()=>{ if(my!==animSeq) return;
+      if(i>0){ const pt=$('#thPanel .tile[data-v="'+seq[i-1]+'"]',scr); if(pt){pt.classList.remove('marker');pt.classList.add('path');} }
       if(i>=seq.length){ Sound.correct(); FX.confetti(); $('#thReadout',scr).textContent='🎉'; Reward.addTreasure(1); return; }
       const n=seq[i]; const t=$('#thPanel .tile[data-v="'+n+'"]',scr); if(t)t.classList.add('marker');
-      $('#thReadout',scr).textContent=n; Voice.num(n);
-      i++; timer=setTimeout(go,720); })(); }
+      $('#thReadout',scr).textContent=n; i++;
+      Voice.speakStep(n, go);   // advance only after this number has finished being spoken (paced to the voice speed + pause)
+    };
+    go(); }
 
   /* place value builder */
   function renderBuild(scr){ const p=$('#thPanel',scr); let h=2,t=4,o=7;
