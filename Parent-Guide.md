@@ -2,7 +2,14 @@
 
 A single HTML file. Double-click `Mayahs-Rainbow-Reef.html` to open it in any browser (Chrome, Safari, Edge). Works on computer and tablet. No internet needed. Progress (treasure + sticker friends) saves automatically on the same device.
 
-**The talking voice:** the app speaks numbers aloud using the device's own natural voice. **Open it in Safari** on the Mac/iPad — Chrome on macOS has a bug that keeps its voices silent, but Safari uses the lovely built-in Mac voices (Samantha, Siri voices, etc.). Tap 🔊 to mute/unmute.
+**Voice settings (⚙️ top-right):** tap the **⚙️** button to open Voice settings. You control:
+- **Talking speed** — slider (or 🐢 Slow / 😊 Normal / 🐰 Fast). Defaults to a gentle, slower speed.
+- **Voice pitch** — slider.
+- **Pause between parts** — how long the voice waits between each spoken part (e.g. "4 hundreds … 4 tens … 7 ones … makes 447"). Increase it so each part lands clearly before the next.
+
+Everything previews as you change it and is saved on the device.
+
+**The talking voice:** the app speaks numbers aloud using the device's own natural voice. **It only speaks when you ask it to** — tapping a number, pressing Count/Go, or pressing a **🔊 Say it / Read to me** button. It never auto-reads a page on its own. **Open it in Safari** on the Mac/iPad — Chrome on macOS has a bug that keeps its voices silent, but Safari uses the lovely built-in Mac voices (Samantha, Siri voices, etc.). Tap 🔊 (top-right) to mute/unmute all sound.
 
 **Sound:** tap the 🔊 button (top right) to toggle all sound, including the voice that *speaks every number aloud* — this is one of the most useful features for connecting the written symbol to its spoken name. The reef has a rich, gentle sound world: water bubbles and droplets, glockenspiel chimes for correct answers, a treasure "ding" when shells are earned, and **musical counting** — each number plays a note on a soft xylophone, so counting up literally sounds like climbing a scale (and down like descending). All generated live; nothing is ever harsh.
 
