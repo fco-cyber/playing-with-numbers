@@ -24,7 +24,9 @@ Everything previews as you change it and is saved on the device.
 → **Number Detective** → *Neighbours*. Shows a number with its four neighbours colour-coded: 1-less (left), 1-more (right), 10-less (straight up), 10-more (straight down). This makes the chart's hidden structure visible — the single most important concept for her difficulty. *Patterns* mode in the chart reinforces it.
 
 **3. "Managing" a number (e.g. 30) — locating it and counting on/back**
-→ **Hop the Number Line.** Set the start to any number, then hop +1/−1/+10/−10 with Hoppy the frog. The live readout always shows "10 less / 1 less / 1 more / 10 more," anchoring the number in its sequence. *Number Detective → Tens & Ones* shows where it "lives" (e.g. 30 = 3 tens, 0 ones).
+→ **Hop the Number Line.** *Explore* mode: set the start to any number, then hop +1/−1/+10/−10 with Hoppy the frog. The live readout always shows "10 less / 1 less / 1 more / 10 more," anchoring the number in its sequence. *Number Detective → Tens & Ones* shows where it "lives" (e.g. 30 = 3 tens, 0 ones).
+
+→ **⭐ Jump to add (the school's method).** This new mode mirrors Mayah's class worksheet exactly — the "jump strategy" on an open number line. For `16 + 32` it **starts with the bigger number (32)**, **splits the other into tens and ones (16 = 10 and 6)**, then draws labelled arcs jumping forward `+10` then `+6` to land on **48**, showing the running number sentence `16 + 32 = 32 + (10 + 6) = 48`. It does **subtraction** the same way (jump *back* `−10`, `−2`), reading right-to-left from the bigger number. The line is drawn **to scale** — a `+10` hop is ten times as wide as a `+1` hop — so the distance she sees always matches the size of the number. Two ways to use it, side by side: **👀 Watch** — she taps "Next jump" to build the picture one arc at a time while Sparkle narrates each step; and **✋ My turn** — she works out *each* landing herself (`44 + 10 = ?`, then `54 + 10 = ?`, then `64 + 4 = ?`); the number line only fills in a landing once she's typed it, so she's genuinely counting on in tens and ones, not copying a number that's already on the screen. Use Watch first to teach the method, then My turn to practise it. This is the single best match to what she's doing at school.
 
 **4. Combinations that make a target number (number bonds)**
 → **Rainbow Bonds** — built directly from her *Rainbow to 10* sheet.
@@ -34,6 +36,17 @@ Everything previews as you change it and is saved on the device.
 - *Make N!*: a game finding the missing part; fill the whole rainbow to win.
 
 ---
+
+## Built on the science of learning
+This app is deliberately designed around techniques with strong peer-reviewed support:
+
+- **Every exercise has a "❓ Quick Quiz" (or find/game) mode**, so retrieval practice runs throughout — not just in one place. **The quizzes now ask Mayah to *work out and type* the answer on a friendly number pad — no multiple-choice options are shown.** This is a deliberate upgrade: guessing from a list only needs *recognition*, but typing the answer needs true *recall*, which is what builds lasting memory. If she's not right, she gets a gentle nudge ("try a bit higher ⬆️ / lower ⬇️") and can try again — never a "wrong". The **Hundreds Chart** quiz has her tap the answer directly on the chart (that tap *is* the recall — finding the number's place), while **Number Line, Number Detective, Treasure to 1000, Make N!** and **Practice** all use the type-it pad. The Number Detective's type-it quiz draws on the same skills its other modes teach — tens & ones ("How many tens in 47?") and neighbours ("10 more than 34?"). All are untimed, with immediate, gentle feedback.
+- **Retrieval practice (being quizzed beats re-reading).** Actively recalling a fact strengthens memory far more than just looking at it — a robust finding across school settings [Agarwal et al., 2019] and specifically in elementary-age children [Karpicke & Aue, 2016]. In young children it works best with **cued recall plus immediate feedback** [Kliegl et al., 2018] — which is exactly how the **🧠 Practice** mode and the new type-it quizzes are built: she is *cued* by the question, must *produce* the answer herself, and gets feedback straight away.
+- **Spaced repetition.** Spreading practice out over time boosts long-term retention [Latimier et al., 2020; Kang, 2016]. The Practice mode uses a Leitner-style scheduler: facts Mayah knows come back rarely; ones she misses come back soon. **Use it a little each day** — that spacing is where the benefit comes from.
+- **Accuracy before speed.** Guidance on arithmetic fluency says to build accuracy first and only add time pressure later [McNeil et al., 2025]. Nothing here is timed or rushed.
+- **Concrete → Representational → Abstract (CRA).** Hands-on/visual models help, especially when tied to the written symbol and then gradually faded [Carbonneau et al., 2013; Donovan et al., 2022]. Every activity pairs a model (ten-frames, base-ten blocks, number line, the new number grid) with the number sentence — and when she gets a Practice question wrong, a ten-frame appears to help her see it.
+
+**How to use it:** a few minutes of **🧠 Practice** most days (bonds to 10, then 20) is the single highest-impact habit. Keep sessions short and positive.
 
 ## Suggested rhythm (short and positive works best at this age)
 - **10–15 minutes**, 4–5 times a week beats one long session.
